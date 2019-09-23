@@ -39,19 +39,19 @@ flags.DEFINE_float('weight_decay', 5e-4, 'Weight for L2 loss on embedding matrix
 flags.DEFINE_integer('early_stopping', 10, 'Tolerance for early stopping (# of epochs).')
 flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
 
-cutoff = 2
+cutoff = 5
 bert_dim = 1024  # each node, representing a token from ConceptNet, has got a feature vector X = H_0, encoded by BERT
 node_num_dict = {1:15416, 2:134233, 3:236097, 5:288359, 10:297373}
 node_num = node_num_dict[cutoff] 
-G = nx.read_edgelist('/tf/gcn_HiEve/gcn/SubG_' + str(cutoff) + '.tsv')
+G = nx.read_edgelist('./SubG_' + str(cutoff) + '.tsv')
 adj = nx.adjacency_matrix(G)
-features = np.fromfile('/tf/gcn_HiEve/gcn/node_feat_vec_H0_cutoff_' + str(cutoff) + '.txt', dtype=np.float32)
+features = np.fromfile('../node_feat_vec_H0_cutoff_' + str(cutoff) + '.txt', dtype=np.float32)
 features = np.reshape(features, (node_num, bert_dim))
 #print(features)
 
 # Load data
 list_1 = []
-with open('/tf/gcn_HiEve/gcn/HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
+with open('./HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
     line = f_index.readline()
     while line:
         list_1.append(line[:-1])
@@ -59,7 +59,7 @@ with open('/tf/gcn_HiEve/gcn/HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as 
         
 # triples are not changing
 triples = []
-with open('/tf/gcn_HiEve/gcn/triples_46072_c.tsv', 'r') as f_data:
+with open('./triples_46072_c.tsv', 'r') as f_data:
     line = f_data.readline()
     while line:
         line = line.split(',')
@@ -179,7 +179,7 @@ def print_res(y_pred, y_true):
 
     
 merged = tf.summary.merge_all() # tensorflow >= 0.12
-writer = tf.summary.FileWriter("./logs/", sess.graph) # tensorflow >=0.12  
+writer = tf.summary.FileWriter("./logs/cutoff_" + str(cutoff) + "/", sess.graph) # tensorflow >=0.12  
 
 # Init variables
 sess.run(tf.global_variables_initializer())
