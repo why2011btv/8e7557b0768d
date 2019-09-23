@@ -8,17 +8,20 @@ import networkx as nx
 from sklearn.model_selection import KFold, StratifiedKFold
 import datetime
 from sklearn.metrics import precision_recall_fscore_support
-from scipy.special import softmax
+import scipy
+#from scipy.special import softmax
 from sklearn.metrics import classification_report
 
 from gcn.utils import *
 from gcn.models import GCN, MLP
+import os
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 # Set random seed
 seed = 123
 np.random.seed(seed)
-tf.compat.v1.set_random_seed(seed)
+tf.set_random_seed(seed)
 
 # Settings
 flags = tf.app.flags
@@ -39,7 +42,7 @@ flags.DEFINE_float('weight_decay', 5e-4, 'Weight for L2 loss on embedding matrix
 flags.DEFINE_integer('early_stopping', 10, 'Tolerance for early stopping (# of epochs).')
 flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
 
-cutoff = 5
+cutoff = 10
 bert_dim = 1024  # each node, representing a token from ConceptNet, has got a feature vector X = H_0, encoded by BERT
 node_num_dict = {1:15416, 2:134233, 3:236097, 5:288359, 10:297373}
 node_num = node_num_dict[cutoff] 
@@ -51,7 +54,7 @@ features = np.reshape(features, (node_num, bert_dim))
 
 # Load data
 list_1 = []
-with open('./HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
+with open('./HiEve_merged_' + str(cutoff) + '_set.tsv', 'r', encoding='utf-8') as f_index:
     line = f_index.readline()
     while line:
         list_1.append(line[:-1])
@@ -59,7 +62,7 @@ with open('./HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
         
 # triples are not changing
 triples = []
-with open('./triples_46072_c.tsv', 'r') as f_data:
+with open('./triples_46072_c.tsv', 'r', encoding='utf-8') as f_data:
     line = f_data.readline()
     while line:
         line = line.split(',')
@@ -168,7 +171,7 @@ def evaluate(features, support, X, y, placeholders):
     return outs_val[0], outs_val[1], outs_val[2], (time.time() - t_test)
 
 def print_res(y_pred, y_true):
-    y_pred = softmax(y_pred, axis=1)
+    y_pred = scipy.special.softmax(y_pred, axis=1)
     #print(y_pred)
     y_pred = np.argmax(y_pred, axis=1)
     #print(y_pred)
@@ -179,7 +182,8 @@ def print_res(y_pred, y_true):
 
     
 merged = tf.summary.merge_all() # tensorflow >= 0.12
-writer = tf.summary.FileWriter("./logs/cutoff_" + str(cutoff) + "/", sess.graph) # tensorflow >=0.12  
+log_dir = "./logs/cutoff_" + str(cutoff) + "_" + datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S") + "/"
+writer = tf.summary.FileWriter(log_dir, sess.graph) # tensorflow >=0.12  
 
 # Init variables
 sess.run(tf.global_variables_initializer())
