@@ -1,1 +1,37 @@
 nohup: ignoring input
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/gcn-1.0-py3.6.egg/gcn/metrics.py:8: softmax_cross_entropy_with_logits (from tensorflow.python.ops.nn_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+
+Future major versions of TensorFlow will allow gradients to flow
+into the labels input on backprop by default.
+
+See `tf.nn.softmax_cross_entropy_with_logits_v2`.
+
+2019-09-23 22:50:52.122819: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2019-09-23 22:50:52.145880: E tensorflow/stream_executor/cuda/cuda_driver.cc:300] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+2019-09-23 22:50:52.145969: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:163] retrieving CUDA diagnostic information for host: 8e7557b0768d
+2019-09-23 22:50:52.146000: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:170] hostname: 8e7557b0768d
+2019-09-23 22:50:52.146113: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:194] libcuda reported version is: 384.130.0
+2019-09-23 22:50:52.146153: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:198] kernel reported version is: 384.130.0
+2019-09-23 22:50:52.146170: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:305] kernel version seems to match DSO: 384.130.0
+2019-09-23 22:50:54.668396: W tensorflow/core/framework/allocator.cc:122] Allocation of 2436079616 exceeds 10% of system memory.
+2019-09-23 22:50:56.668694: W tensorflow/core/framework/allocator.cc:122] Allocation of 2436079616 exceeds 10% of system memory.
+2019-09-23 22:51:01.925556: W tensorflow/core/framework/allocator.cc:122] Allocation of 2436079616 exceeds 10% of system memory.
+2019-09-23 22:51:01.925557: W tensorflow/core/framework/allocator.cc:122] Allocation of 2436079616 exceeds 10% of system memory.
+2019-09-23 22:51:13.240912: W tensorflow/core/framework/allocator.cc:122] Allocation of 2436079616 exceeds 10% of system memory.
+/usr/local/lib/python3.6/dist-packages/tensorflow/python/ops/gradients_impl.py:112: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+2019-09-23 22:46:40
+TRAIN: [    0     2     3 ... 46069 46070 46071] TEST: [    1     5     8 ... 46041 46046 46056]
+TRAIN: [    0     1     2 ... 46068 46069 46070] TEST: [   15    27    30 ... 46063 46067 46071]
+TRAIN: [    0     1     2 ... 46068 46069 46071] TEST: [   12    21    24 ... 46065 46066 46070]
+TRAIN: [    0     1     4 ... 46069 46070 46071] TEST: [    2     3     6 ... 46061 46062 46064]
+TRAIN: [    1     2     3 ... 46067 46070 46071] TEST: [    0     4    13 ... 46059 46068 46069]
+train:
+
+Traceback (most recent call last):
+  File "train.py", line 204, in <module>
+    print_res(outs[3], y_train)
+  File "train.py", line 174, in print_res
+    y_pred = scipy.special.softmax(y_pred, axis=1)
+AttributeError: module 'scipy.special' has no attribute 'softmax'
