@@ -1,72 +1,13 @@
-# Graph Convolutional Networks
+node_feat_vec_H0_c2_gen.ipynb: feature vector generator, H_0 = X 
 
-This is a TensorFlow implementation of Graph Convolutional Networks for the task of (semi-supervised) classification of nodes in a graph, as described in our paper:
- 
-Thomas N. Kipf, Max Welling, [Semi-Supervised Classification with Graph Convolutional Networks](http://arxiv.org/abs/1609.02907) (ICLR 2017)
+node_feat_vec_H0_cutoff_m.txt: feature vector generated, m (= 1,2,3,5,10) is cutoff.
 
-For a high-level explanation, have a look at our blog post:
+SubG_m.tsv: Graph, m (= 1,2,3,5,10) is cutoff.
+Usage: G = nx.read_edgelist('/tf/gcn/gcn/SubG_' + str(cutoff) + '.tsv')
 
-Thomas Kipf, [Graph Convolutional Networks](http://tkipf.github.io/graph-convolutional-networks/) (2016)
+HiEve_merged_m_set.tsv: list of triggers with '_', m (= 1,2,3,5,10) is cutoff.
 
-## Installation
+why_merged_10_set.tsv: list of triggers without '_', m (= 1,2,3,5,10) is cutoff. These triggers can be found in ConceptNet, we use pretrained BERT (https://github.com/hanxiao/bert-as-service) to generate feature vectors for each trigger.
 
-```bash
-python setup.py install
-```
+bert-serving-start -model_dir /notebooks/uncased_L-24_H-1024_A-16 -num_worker=1 -max_seq_len=None -device_map=0
 
-## Requirements
-* tensorflow (>0.12)
-* networkx
-
-## Run the demo
-
-```bash
-cd gcn
-python train.py
-```
-
-## Data
-
-In order to use your own data, you have to provide 
-* an N by N adjacency matrix (N is the number of nodes), 
-* an N by D feature matrix (D is the number of features per node), and
-* an N by E binary label matrix (E is the number of classes).
-
-Have a look at the `load_data()` function in `utils.py` for an example.
-
-In this example, we load citation network data (Cora, Citeseer or Pubmed). The original datasets can be found here: http://linqs.cs.umd.edu/projects/projects/lbc/. In our version (see `data` folder) we use dataset splits provided by https://github.com/kimiyoung/planetoid (Zhilin Yang, William W. Cohen, Ruslan Salakhutdinov, [Revisiting Semi-Supervised Learning with Graph Embeddings](https://arxiv.org/abs/1603.08861), ICML 2016). 
-
-You can specify a dataset as follows:
-
-```bash
-python train.py --dataset citeseer
-```
-
-(or by editing `train.py`)
-
-## Models
-
-You can choose between the following models: 
-* `gcn`: Graph convolutional network (Thomas N. Kipf, Max Welling, [Semi-Supervised Classification with Graph Convolutional Networks](http://arxiv.org/abs/1609.02907), 2016)
-* `gcn_cheby`: Chebyshev polynomial version of graph convolutional network as described in (Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst, [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering](https://arxiv.org/abs/1606.09375), NIPS 2016)
-* `dense`: Basic multi-layer perceptron that supports sparse inputs
-
-## Graph classification
-
-Our framework also supports batch-wise classification of multiple graph instances (of potentially different size) with an adjacency matrix each. It is best to concatenate respective feature matrices and build a (sparse) block-diagonal matrix where each block corresponds to the adjacency matrix of one graph instance. For pooling (in case of graph-level outputs as opposed to node-level outputs) it is best to specify a simple pooling matrix that collects features from their respective graph instances, as illustrated below:
-
-![graph_classification](https://user-images.githubusercontent.com/7347296/34198790-eb5bec96-e56b-11e7-90d5-157800e042de.png)
-
-
-## Cite
-
-Please cite our paper if you use this code in your own work:
-
-```
-@inproceedings{kipf2017semi,
-  title={Semi-Supervised Classification with Graph Convolutional Networks},
-  author={Kipf, Thomas N. and Welling, Max},
-  booktitle={International Conference on Learning Representations (ICLR)},
-  year={2017}
-}
-```

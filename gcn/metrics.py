@@ -9,6 +9,13 @@ def masked_softmax_cross_entropy(preds, labels):
     weighted_losses = unweighted_losses * weights
     loss = tf.reduce_mean(weighted_losses)
     
+    y_pred = tf.argmax(tf.nn.softmax(preds, axis=1), axis=1)
+    recall = tf.metrics.recall(labels[:,1],y_pred)
+    precision = tf.metrics.precision(labels[:,1],y_pred)
+    
+    tf.summary.scalar('loss', loss) # tensorflow >= 0.12
+    tf.summary.scalar('recall', recall) # tensorflow >= 0.12
+    tf.summary.scalar('precision', precision) # tensorflow >= 0.12
     return loss
 
 

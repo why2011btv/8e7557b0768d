@@ -26,14 +26,14 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('dataset', 'cora', 'Dataset string.')  # 'cora', 'citeseer', 'pubmed'
 flags.DEFINE_string('model', 'gcn', 'Model string.')  # 'gcn', 'gcn_cheby', 'dense'
-flags.DEFINE_float('learning_rate', 0.001, 'Initial learning rate.')
-flags.DEFINE_integer('epochs', 200, 'Number of epochs to train.')
+flags.DEFINE_float('learning_rate', 0.0001, 'Initial learning rate.')
+flags.DEFINE_integer('epochs', 400, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden1', 2048, 'Number of units in GCN hidden layer 1.')
 flags.DEFINE_integer('hidden2', 1024, 'Number of units in GCN hidden layer 2.')
 flags.DEFINE_integer('dense1', 1024, 'Number of units in dense layer 1.')
-flags.DEFINE_integer('dense2', 512, 'Number of units in dense layer 2.')
-flags.DEFINE_integer('dense3', 256, 'Number of units in dense layer 3.')
-flags.DEFINE_integer('dense4', 16, 'Number of units in dense layer 4.')
+flags.DEFINE_integer('dense2', 32, 'Number of units in dense layer 2.')
+#flags.DEFINE_integer('dense3', 256, 'Number of units in dense layer 3.')
+#flags.DEFINE_integer('dense4', 16, 'Number of units in dense layer 4.')
 flags.DEFINE_float('dropout', 0.5, 'Dropout rate (1 - keep probability).')
 flags.DEFINE_float('weight_decay', 5e-4, 'Weight for L2 loss on embedding matrix.')
 flags.DEFINE_integer('early_stopping', 10, 'Tolerance for early stopping (# of epochs).')
@@ -43,15 +43,15 @@ cutoff = 2
 bert_dim = 1024  # each node, representing a token from ConceptNet, has got a feature vector X = H_0, encoded by BERT
 node_num_dict = {1:15416, 2:134233, 3:236097, 5:288359, 10:297373}
 node_num = node_num_dict[cutoff] 
-G = nx.read_edgelist('/tf/gcn/gcn/SubG_' + str(cutoff) + '.tsv')
+G = nx.read_edgelist('/tf/gcn_HiEve/gcn/SubG_' + str(cutoff) + '.tsv')
 adj = nx.adjacency_matrix(G)
-features = np.fromfile('/tf/gcn/gcn/node_feat_vec_H0_cutoff_' + str(cutoff) + '.txt', dtype=np.float32)
+features = np.fromfile('/tf/gcn_HiEve/gcn/node_feat_vec_H0_cutoff_' + str(cutoff) + '.txt', dtype=np.float32)
 features = np.reshape(features, (node_num, bert_dim))
 #print(features)
 
 # Load data
 list_1 = []
-with open('/tf/gcn/gcn/HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
+with open('/tf/gcn_HiEve/gcn/HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_index:
     line = f_index.readline()
     while line:
         list_1.append(line[:-1])
@@ -59,7 +59,7 @@ with open('/tf/gcn/gcn/HiEve_merged_' + str(cutoff) + '_set.tsv', 'r') as f_inde
         
 # triples are not changing
 triples = []
-with open('/tf/gcn/gcn/triples_46072_c.tsv', 'r') as f_data:
+with open('/tf/gcn_HiEve/gcn/triples_46072_c.tsv', 'r') as f_data:
     line = f_data.readline()
     while line:
         line = line.split(',')
@@ -176,7 +176,11 @@ def print_res(y_pred, y_true):
     #print(precision_recall_fscore_support(y_true, y_pred, average='binary'))
     target_names = ['class 0', 'class 1']
     print(classification_report(y_true[:,1], y_pred, target_names=target_names))
+
     
+merged = tf.summary.merge_all() # tensorflow >= 0.12
+writer = tf.summary.FileWriter("./logs/", sess.graph) # tensorflow >=0.12  
+
 # Init variables
 sess.run(tf.global_variables_initializer())
 
@@ -201,7 +205,9 @@ for epoch in range(FLAGS.epochs):
     print("valid:\n")
     print_res(output_val, y_valid)
     cost_val.append(cost)
-
+    
+    
+    
     # Print results
     #print("prediction results:\n")
     #print(outs[3])
@@ -223,4 +229,7 @@ print_res(output_test, y_test)
 
 print("Test set results:", "cost=", "{:.5f}".format(test_cost),
       "accuracy=", "{:.5f}".format(test_acc), "time=", "{:.5f}".format(test_duration))
+
+
+
 

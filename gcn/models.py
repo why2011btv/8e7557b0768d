@@ -137,7 +137,7 @@ class GCN(Model):
                                  act=tf.nn.relu,
                                  dropout=True,
                                  logging=self.logging))
-        
+        '''
         self.layers.append(Dense(input_dim=FLAGS.dense2,
                                  output_dim=FLAGS.dense3,
                                  placeholders=self.placeholders,
@@ -151,8 +151,8 @@ class GCN(Model):
                                  act=tf.nn.relu,
                                  dropout=True,
                                  logging=self.logging))
-        
-        self.layers.append(Dense(input_dim=FLAGS.dense4,
+        '''
+        self.layers.append(Dense(input_dim=FLAGS.dense2,
                                  output_dim=2,    # Haoyu uses zero_one func to convert 0/1 to [1,0]/[0,1], thus in consistent with original 7 classes one-hot vector
                                  placeholders=self.placeholders,
                                  act=lambda x: x,
@@ -175,10 +175,10 @@ class GCN(Model):
         self.activations.append(dense)
         dense = self.layers[4](self.activations[-1])
         self.activations.append(dense)
-        dense = self.layers[5](self.activations[-1])
-        self.activations.append(dense)
-        dense = self.layers[6](self.activations[-1])
-        self.activations.append(dense)
+        #dense = self.layers[5](self.activations[-1])
+        #self.activations.append(dense)
+        #dense = self.layers[6](self.activations[-1])
+        #self.activations.append(dense)
         
         #for layer in self.layers:
         #    hidden = layer(self.activations[-1])
